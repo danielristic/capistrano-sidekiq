@@ -69,7 +69,7 @@ namespace :sidekiq do
           execute :systemctl, "--user", "stop", fetch(:service_unit_name)
           processes = fetch(:sidekiq_processes).to_i
           if processes > 1
-            (2..processes).each {|i| execute :systemctl, '--user', 'start', fetch(:service_unit_name)+i.to_s }
+            (2..processes).each {|i| execute :systemctl, '--user', 'start', fetch(:service_unit_name).gsub(/\./,'#{i}.') }
           end
         when :upstart
           sudo :service, fetch(:upstart_service_name), :stop
@@ -95,7 +95,7 @@ namespace :sidekiq do
           execute :systemctl, '--user', 'start', fetch(:service_unit_name)
           processes = fetch(:sidekiq_processes).to_i
           if processes > 1
-            (2..processes).each {|i| execute :systemctl, '--user', 'start', fetch(:service_unit_name)+i.to_s }
+            (2..processes).each {|i| execute :systemctl, '--user', 'start', fetch(:service_unit_name).gsub(/\./,'#{i}.') }
           end
         when :upstart
           sudo :service, fetch(:upstart_service_name), :start
