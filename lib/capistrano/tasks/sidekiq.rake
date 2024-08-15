@@ -67,6 +67,9 @@ namespace :sidekiq do
         case fetch(:init_system)
         when :systemd
           execute :systemctl, "--user", "stop", fetch(:service_unit_name)
+          if processes > 1
+            Array(2..processes) {|i| execute :systemctl, '--user', 'start', fetch(:service_unit_name)+i.to_s }
+          end
         when :upstart
           sudo :service, fetch(:upstart_service_name), :stop
         else
@@ -89,6 +92,10 @@ namespace :sidekiq do
         case fetch(:init_system)
         when :systemd
           execute :systemctl, '--user', 'start', fetch(:service_unit_name)
+          processes = fetch(:sidekiq_processes)
+          if processes > 1
+            Array(2..processes) {|i| execute :systemctl, '--user', 'start', fetch(:service_unit_name)+i.to_s }
+          end
         when :upstart
           sudo :service, fetch(:upstart_service_name), :start
         else
