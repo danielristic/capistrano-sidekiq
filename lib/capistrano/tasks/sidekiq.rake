@@ -45,6 +45,10 @@ namespace :sidekiq do
         case fetch(:init_system)
         when :systemd
           execute :systemctl, "--user", "reload", fetch(:service_unit_name), raise_on_non_zero_exit: false
+          processes = fetch(:sidekiq_processes).to_i
+          if processes > 1
+            (2..processes).each {|i| execute :systemctl, "--user", "reload", fetch(:service_unit_name).gsub(/\./,"#{i}."), raise_on_non_zero_exit: false }
+          end
         when :upstart
           sudo :service, fetch(:upstart_service_name), :reload
         else
